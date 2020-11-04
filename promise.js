@@ -23,7 +23,7 @@ function promise(exector) {
   // 失败执行
   function reject(value) {
     if (self.status === "pending") {
-      self.value = value;
+      self.reason = value;
       self.status = "reject";
       self.onRejectedCallback.forEach(fn => fn());
     }
