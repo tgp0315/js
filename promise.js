@@ -13,19 +13,23 @@ function promise(exector) {
   function resolve(value) {
     // 判断是否处于pending状态
     if (self.status === "pending") {
-      self.value = value;
-      // 执行之后需要改变状态
-      self.status = "resolve";
-      // 成功之后遍历then中成功的所有回调函数
-      self.onRejectedCallback.forEach(fn => fn());
+      setTimeout(() => {
+        self.value = value;
+        // 执行之后需要改变状态
+        self.status = "resolve";
+        // 成功之后遍历then中成功的所有回调函数
+        self.onRejectedCallback.forEach(fn => fn());
+      }, 0)
     }
   }
   // 失败执行
   function reject(value) {
     if (self.status === "pending") {
-      self.reason = value;
-      self.status = "reject";
-      self.onRejectedCallback.forEach(fn => fn());
+      setTimeout(() => {
+        self.reason = value;
+        self.status = "reject";
+        self.onRejectedCallback.forEach(fn => fn());
+      }, 0)
     }
   }
   // 这里对异常进行处理
@@ -68,6 +72,43 @@ let promise = new Promise((resolve, reject) => {
   })
 })
 
+Promise.prototype.all = function(promises) {
+  return new Promise(function (resolve, reject) {
+    let result = [];
+    let count = 0;
+    for (let i = 0; i < promise.length; i++) {
+      promise[i].then(function(data) {
+        result[i] = data;
+        if (++count === promise.length) {
+          resolve(result);
+        }
+      }, function(error) {
+        reject(error)
+      })
+    }
+  })
+}
+Promise.prototype.race = function (promise) {
+  return new MyPromise(function(resolve, reject) {
+    for (let i = 0; i < promises.length; i++) {
+      promises[i].then(function(data) {
+        resolve(data);
+      }, function(error) {
+        reject(error);
+      });
+    }
+  });
+}
+Promise.prototype.resolve = function(value) {
+  return new MyPromise(resolve => {
+    resolve(value);
+  }); 
+}
+Promise.prototype.reject = function(error) {
+  return new MyPromise((resolve, reject) => {
+    reject(error);
+  });
+}
 promise.then((data) => {
   console.log('success' + data);
 }, (err) => {
