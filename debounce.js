@@ -2,15 +2,20 @@
 function debounce(fn, wait, immediate) {
   var timeout;
   return function () {
-    var context = this, args = arguments;
-    var later = function() {
-      timeout = null;
-      if (!timeout) fn.apply(context, args);
+    var context = this;
+    var args = arguments;
+    if (timeout) clearTimeout(timeout);
+    if (immediate) {
+      var callNow = !timeout;
+      timeout = setTimeout(function() {
+        timeout = null;
+      }, wait);
+      if (callNow) fn.apply(context, args);
+    } else {
+      timeout = setTimeout(function() {
+        fn.apply(context, args);
+      }, wait)
     }
-    var callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) fn.apply(context, args);
   };
 };
 
