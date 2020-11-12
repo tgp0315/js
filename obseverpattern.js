@@ -9,12 +9,14 @@ class Obsever {
       this.topics[topic] = [];
     }
     this.topics[topic].push(handler);
+    return this;
   }
   // 发布事件，触发观察者回调事件
   publish(topic, info) {
     if (this.topics.hasOwnProperty(topic)) {
       this.topics[topic].forEach(handler => handler(info));
     }
+    return this;
   }
   //移除主题的一个观察者回调
   remove(topic, handler) {
@@ -28,10 +30,12 @@ class Obsever {
     if (handlerIndex >= 0) {
       this.topics[topic].splice(handlerIndex, 1);
     }
+    return this;
   }
   removeAll(topic) {
     if (!this.topics.hasOwnProperty(topic)) {
       this.topics[topic] = [];
     }
+    return this;
   }
 }
