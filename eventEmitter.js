@@ -9,11 +9,10 @@ class EventEmitter {
   on(eventName, callback) {
     if (!this.events[eventName]) {
       // 一个名字可以订阅多个事件函数
-      this.events[eventName] = [callback];
-    } else {
-      // 存在则push到指定数组的尾部保存
-      this.events[eventName].push(callback);
+      this.events[eventName] = [];
     }
+    // 存在则push到指定数组的尾部保存
+    this.events[eventName].push(callback);
   }
   // 触发事件的方法
   emit(eventName, ...rest) {
