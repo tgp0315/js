@@ -8,7 +8,7 @@ function promise(exector) {
   //存储then中成功的回调函数
   this.onResolvedCallbacks = [];
   // 存储then中失败的回调函数
-  this.onRejectedCallback = [];
+  this.onRejectedCallbacks = [];
   // 成功执行
   function resolve(value) {
     // 判断是否处于pending状态
@@ -42,24 +42,72 @@ function promise(exector) {
 
 promise.prototype.then = function(onFulfilled, onRejected) {
   let self = this;
+  onFulfilled = typeof onFulfilled === "function" ? onFulfilled : function(value) {};
+  onRejected = typeof onRejected === "function" ? onRejected : function(reason) {};
   if (this.status === "resolved") {
-    onFulfilled(self.value);
+    // onFulfilled(self.value);
+    return new Promise(function(resolve, reject) {
+      try {
+        var x = onFulfilled(self.value);
+        if (x instanceof Promise) {
+          x.then(resolve, reject);
+        }
+        resolve(x);
+      } catch (e) {
+        reject(e);
+      }
+    })
   }
   if (this.status === "rejectd") {
-    onRejected(self.reason);
+    // onRejected(self.reason);
+    return new Promise(function (resolve, reject) {
+      try {
+        var x = onRejected(self.reason);
+        if (x instanceof Promise) {
+          x.then(resolve, reject);
+        }
+      } catch (e) {
+        reject(e);
+      }
+    })
   }
   // 如果异步执行则为pending状态
   if (this.status === "pending") {
     // 保存回调函数
-    this.onRejectedCallback.push(() => {
-      onFulfilled(self.value);
-    })
-    this.onResolvedCallbacks.push(() => {
-      onRejected(self.reason);
+    // this.onRejectedCallback.push(() => {
+    //   onFulfilled(self.value);
+    // })
+    // this.onResolvedCallbacks.push(() => {
+    //   onRejected(self.reason);
+    // })
+    return new Promise(function (resolve, reject) {
+      self.onResolvedCallbacks.push(function(value) {
+        try {
+          var x = onFulfilled(self.value);
+          if (x instanceof Promise) {
+            x.then(resolve, reject);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      })
+      self.onRejectedCallbacks.push(function(reason) {
+        try {
+          var x = onRejected(self.reason);
+          if (x instanceof promise) {
+            x.then(resolve, reject);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      })
     })
   }
 }
 
+Promise.prototype.catch = function(onRejected) {
+  return this.then(null, onRejected);
+}
 // 这里我们可以再次实验
 
 let promise = new Promise((resolve, reject) => {
