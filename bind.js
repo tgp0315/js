@@ -10,7 +10,7 @@ function myBind(context) {
   var A = function() {};
   var B = function() {
     var _this = this instanceof self ?  this : context;
-    return self.apply(_this, args.concat(Array.prototype.slice.call(arguments, 1)));
+    return self.apply(_this, args.concat(Array.prototype.slice.call(arguments, 0)));
   }
   if (this.prototype) {
     A.prototype = this.prototype;
