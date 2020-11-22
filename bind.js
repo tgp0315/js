@@ -1,5 +1,3 @@
-const { type } = require("os");
-
 // 手写实现bind
 function myBind(context) {
   context = context || window;
